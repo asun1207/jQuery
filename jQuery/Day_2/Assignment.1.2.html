@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Assignment.1.2</title>
+    <style>
+      .row.active {
+        background-color: lightblue;
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  </head>
+  <body>
+    <button disabled>Delete</button>
+    <button>Up</button>
+    <button>Down</button>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Product Name</th>
+          <th>Price ($)</th>
+          <th>Amount</th>
+          <th>Total ($)</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3" align="right">Subtotal:</td>
+          <td colspan="1"></td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <script>
+      $(document).ready(() => {
+        $.getJSON("./invoice.json", (data) => {
+          let invoiceData = "";
+          $.each(data, (key, value) => {
+            invoiceData += "<tr class='row'>";
+            invoiceData += "<td>" + value.pname + "</td>";
+            invoiceData += "<td>" + value.price + "</td>";
+            invoiceData += "<td>" + value.amount + "</td>";
+            invoiceData += "<td>" + parseFloat(value.price * value.amount).toFixed(2) + "</td>";
+            invoiceData += "</tr>";
+          });
+          $("tbody").append(invoiceData);
+
+          const deleteDis = () => {
+            if ($(".row.active").length > 0) {
+              $("button:contains('Delete')").attr("disabled", false);
+            } else {
+              $("button:contains('Delete')").attr("disabled", true);
+            }
+          };
+          $("tbody").on("click", ".row", (e) => {
+            if (e.altKey) {
+              $(e.currentTarget).toggleClass("active");
+            } else if ($(e.currentTarget).hasClass("active")) {
+              $(e.currentTarget).removeClass("active");
+            } else {
+              $(".row").removeClass("active");
+              $(e.currentTarget).addClass("active");
+            }
+            deleteDis();
+          });
+
+          const moveHandler = (e) => {
+            switch ($(e.target).text()) {
+              case "Up":
+                if ($(".row.active").length == 1) {
+                  const currentRow = $(".row.active");
+                  currentRow.prev().before(currentRow);
+                }
+                break;
+              case "Down":
+                if ($(".row.active").length == 1) {
+                  const currentRow = $(".row.active");
+                  currentRow.next().after(currentRow);
+                }
+                break;
+            }
+          };
+
+          const deleteHandler = () => {
+            $(".row.active").remove();
+            deleteDis();
+          };
+
+          $("button").on("click", moveHandler);
+          $("button:contains('Delete')").on("click", deleteHandler);
+        });
+      });
+    </script>
+  </body>
+</html>

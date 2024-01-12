@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice Table</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <!-- invoice.html -->
+    <div class="table-responsive">
+      <table class="table table-striped table-hover table-borderless table-primary align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>PAY PAGE</th>
+          </tr>
+        </thead>
+        <tbody class="table-group-divider"></tbody>
+        <tfoot>
+          <tr>
+            <td align="right">Total Price:</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </body>
+  <script type="module">
+    import Product from "./class/productClass.js";
+    import item from "./class/cartItem.js";
+    import User from "./class/User.js";
+    const calculateTotalPrice = (itemCollection) => {
+      let total = 0;
+      itemCollection.forEach((item) => {
+        total += item.price * item.amount;
+      });
+      return total.toFixed(2); // 소수점 둘째 자리까지 표시
+    };
+
+    // 이전 페이지에서 저장된 데이터 불러오기
+    const itemCollection = JSON.parse(sessionStorage.getItem("itemCollection"));
+    const totalPrice = sessionStorage.getItem("totalPrice");
+
+    // 총 가격을 계산하고 테이블에 표시하는 함수
+    const updateTable = () => {
+      const totalPriceCell = $("tfoot td:last-child");
+      const totalPrice = calculateTotalPrice(itemCollection);
+      totalPriceCell.text(totalPrice);
+
+      // 테이블에 itemCollection을 표시하는 로직 추가
+    };
+
+    // 페이지 로드 시 테이블 업데이트 실행
+    $(document).ready(() => {
+      updateTable();
+    });
+  </script>
+</html>

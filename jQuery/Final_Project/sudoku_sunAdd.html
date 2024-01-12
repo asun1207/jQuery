@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sudoku Board</title>
+    <!-- Incluye Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+      .cell {
+        width: 50px;
+        height: 50px;
+        border-right: 1px solid darkgray;
+        border-left: 1px solid darkgray;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 20px;
+        font-weight: bold;
+        color: black;
+        background-color: white;
+        box-sizing: border-box;
+      }
+      .subgrid {
+        display: flex;
+        flex-wrap: wrap;
+        width: 450px;
+        border-bottom: 1px solid darkgray;
+        border-top: 1px solid darkgray;
+      }
+      .subgrid:nth-child(3n) {
+        border-bottom: 3px solid darkgray;
+      }
+      .subgrid:nth-child(3n + 1) {
+        border-top: 3px solid darkgray;
+      }
+
+      .cell:nth-child(3n) {
+        border-right: 3px solid darkgray;
+      }
+      .cell:nth-child(3n + 1) {
+        border-left: 3px solid darkgray;
+      }
+
+      #sudoku-board {
+        width: 450px;
+        height: 450px;
+        margin: 0 auto;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        align-items: center;
+      }
+
+      .cell:hover {
+        background-color: #f5f5f5;
+      }
+      .cell-selected {
+        background-color: #000000;
+        color: #ffffff;
+      }
+      .cell-selected:hover {
+        background-color: #000000;
+        color: #ffffff;
+      }
+      .options {
+        width: 50%;
+        height: 10%;
+        margin: 0 auto;
+        padding: 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 20px;
+        font-weight: bold;
+        color: rgb(3, 0, 158);
+        background-color: white;
+        gap: 3px;
+      }
+      .btn-container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+      .div-options {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid black;
+        border-radius: 10%;
+        box-shadow: rgb(3, 0, 158);
+      }
+
+      .div-options:hover {
+        background-color: rgb(208, 226, 232);
+        cursor: pointer;
+      }
+      .div-options:active {
+        background-color: #f5f5f5;
+      }
+      .rep {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border-color: red;
+        border-style: solid;
+        border-width: 1px;
+      }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.4.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </head>
+  <header>
+    <figure class="text-center">
+      <blockquote class="blockquote">
+        <h1 class="mt-3" style="font-family: Arial, Helvetica, sans-serif; font-weight: bold">Sudoku</h1>
+      </blockquote>
+      <figcaption class="blockquote-footer">We are <cite title="Source Title">Benardo, Kosuke, Nacho, Sun</cite></figcaption>
+    </figure>
+  </header>
+  <body>
+    <div class="container">
+      <div class="col-12">
+        <div id="sudoku-board"></div>
+      </div>
+      <div class="options mt-5"></div>
+      <div class="btn-container">
+        <button type="button" class="btn btn-outline-danger mt-5">Validate</button>
+        <button type="button" class="btn btn-outline-primary mt-5">Restart</button>
+        <button type="button" class="btn btn-outline-danger mt-5">Random</button>
+      </div>
+    </div>
+  </body>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+    let splitedMockdata = [];
+    let mockdata = [];
+    let x, y, value;
+    let selectedNum;
+
+    //populating table
+    function generateEmptySudokuBoard() {
+      const board = document.getElementById("sudoku-board");
+
+      for (let i = 0; i < 9; i++) {
+        const subgrid = document.createElement("div");
+        subgrid.classList.add("subgrid");
+
+        for (let j = 0; j < 9; j++) {
+          const cell = document.createElement("div");
+          cell.classList.add("cell");
+          subgrid.appendChild(cell);
+        }
+        board.appendChild(subgrid);
+      }
+      for (let idx in splitedMockdata) {
+        printValues(splitArray(splitedMockdata[idx]), idx);
+      }
+      options();
+      cellVal();
+    }
+
+    //Splitting JSON data array to every three number
+    function splitArray(array) {
+      var splitedArr = [];
+      for (let i = 0; i < array.length; i += 3) {
+        splitedArr.push(array.slice(i, i + 3));
+      }
+      return splitedArr;
+    }
+
+    //Making each value created by splitArray into different array
+    function getCoord(array) {
+      const coords = [];
+      for (let i = 0; i < array.length; i++) {
+        x = array[i][0];
+        y = array[i][1];
+        value = array[i][2];
+        coords.push({ x, y, value });
+      }
+      return coords;
+    }
+
+    //Finding a cell having proper coordinate and input the value
+    function printValues(array, box) {
+      let cells = document.querySelectorAll(".cell");
+      let coordinates = getCoord(array);
+      coordinates.forEach((coord) => {
+        let cellIndex = ((box % 3) * 3 + (coord.x - 1)) * 9 + (Math.floor(box / 3) * 3 + (coord.y - 1));
+        //console.log(cellIndex);
+        cells[cellIndex].innerText = coord.value;
+        cells[cellIndex].style.pointerEvents = "none";
+      });
+    }
+    function mockdataSplit(data) {
+      //console.log(data);
+      for (let d of data) {
+        d = d.split("");
+        splitedMockdata.push(d);
+      }
+      return splitedMockdata;
+    }
+
+    // loading JSON file
+    const load = () => {
+      let loadJson = new Promise((res, rej) => {
+        $.getJSON("./MOCK_DATA.json", (data, status, xhr) => {
+          if (status == "success") {
+            $.each(data, (idx, value) => {
+              $.each(value, (key, val) => {
+                mockdata.push(val);
+              });
+            });
+            let modifiedMockdata = [];
+            modifiedMockdata = mockdataSplit(mockdata);
+            //console.log(modifiedMockdata);
+            res(modifiedMockdata);
+          } else {
+            rej(status);
+          }
+        }).then(generateEmptySudokuBoard, (reason) => {
+          alert(reason);
+        });
+      });
+    };
+    load();
+
+    //Selecting input value and storing the value as selected value
+    function options() {
+      let opNum = document.querySelector(".options");
+      for (let i = 1; i <= 9; i++) {
+        let option = document.createElement("div");
+        option.classList.add("div-options");
+        option.textContent = i;
+        opNum.append(option);
+      }
+
+      // When user click the number, the clicked number's background color is yellow
+      document.querySelector(".options").addEventListener("click", (e) => {
+        // Reset the clicked number's background color
+        document.querySelectorAll(".div-options").forEach((option) => {
+          option.style.backgroundColor = "";
+        });
+        selectedNum = e.target.textContent;
+        e.target.style.backgroundColor = "lightskyblue";
+        console.log(selectedNum);
+      });
+    }
+
+    //Adding event listner to the cells and inputting selected value
+    function cellVal() {
+      var cells = document.querySelectorAll(".cell");
+      for (let i = 0; i < cells.length; i++) {
+        cells[i].addEventListener("click", (e) => {
+          if (selectedNum != null) {
+            // If user clicked cell again, it will be removed
+            // if (e.target.textContent !== "") {
+            //   e.target.textContent = "";
+            // } else {
+            console.log(e.target);
+            e.target.textContent = selectedNum;
+            // }
+          }
+        });
+      }
+    }
+
+    //Get value of column
+    function getCols() {
+      let cells = document.querySelectorAll(".cell");
+      let tmpArr = [];
+      let colArr = [];
+      for (let i = 0; i < cells.length; i += 9) {
+        for (let j = 0; j < 9; j++) {
+          tmpArr.push(cells[i + j]);
+        }
+        colArr.push(tmpArr);
+        tmpArr = [];
+      }
+      return colArr;
+    }
+
+    //Get value of rows
+    function getRows() {
+      let cells = document.querySelectorAll(".cell");
+      let rowArr = [];
+      let tmpArr = [];
+      for (let i = 0; i < 9; i++) {
+        for (let j = 0; j < cells.length; j += 9) {
+          tmpArr.push(cells[i + j]);
+        }
+        rowArr.push(tmpArr);
+        tmpArr = [];
+      }
+      return rowArr;
+    }
+
+    //Get value of boxes
+    function getBoxes() {
+      let cells = document.querySelectorAll(".cell");
+      let boxArr = [];
+      let tmpArr = [];
+      for (let i = 0; i < 27; i += 9) {
+        for (let j = 0; j < 9; j += 3) {
+          for (let k = 0; k < 3; k++) {
+            for (let l = 0; l < 3; l++) {
+              tmpArr.push(cells[k * 9 + (j / 3) * 27 + l + ((i % 9) / 3) * 18]);
+            }
+          }
+          boxArr.push(tmpArr);
+          tmpArr = [];
+        }
+      }
+      return boxArr;
+    }
+
+    //Function to validate the sudoku game
+    function validate(rocobo) {
+      //rocobo --> Row/Col/Box
+      switch (rocobo) {
+        case getRows:
+          let rows = getRows();
+          for (let i = 0; i < rows.length; i++) {
+            for (j = 0; j < rows[i].length; j++) {
+              for (k = 0; k < rows[i].length; k++) {
+                if (rows[i][j].textContent == rows[i][k].textContent && rows[i][j].textContent != "" && k != j) {
+                  console.log("repeated (r): " + rows[i][j].textContent);
+                  rows[i][j].style.borderColor = "red";
+                }
+              }
+            }
+          }
+
+        case getCols:
+          let cols = getCols();
+          for (let i = 0; i < cols.length; i++) {
+            for (j = 0; j < cols[i].length; j++) {
+              for (k = 0; k < cols[i].length; k++) {
+                if (cols[i][j].textContent == cols[i][k].textContent && cols[i][j].textContent != "" && k != j) {
+                  console.log("repeated (c): " + cols[i][j].textContent);
+                  cols[i][j].style.borderColor = "red";
+                }
+              }
+            }
+          }
+
+        case getBoxes:
+          let boxes = getBoxes();
+          for (let i = 0; i < boxes.length; i++) {
+            for (j = 0; j < boxes[i].length; j++) {
+              for (k = 0; k < boxes[i].length; k++) {
+                if (boxes[i][j].textContent == boxes[i][k].textContent && boxes[i][j].textContent != "" && k != j) {
+                  console.log("repeated (b): " + boxes[i][j].textContent);
+                  boxes[i][j].style.borderColor = "red";
+                }
+              }
+            }
+          }
+          break;
+      }
+    }
+
+    //Check the values of cell is filled up or not
+    function isFull() {
+      let cells = document.querySelectorAll(".cell");
+      var counter = 0;
+      for (let i = 0; i < cells.length; i++) {
+        if (cells[i].textContent == "") {
+          counter++;
+        }
+      }
+      return counter;
+    }
+
+    // Function producing random value for test
+    document.querySelectorAll("button")[2].addEventListener("click", () => {
+      const cells = document.querySelectorAll(".cell");
+      for (let cell of cells) {
+        cell.textContent = Math.floor(Math.random() * 9) + 1; // random value from 1 to 9
+      }
+    });
+    // Restart button
+    document.querySelectorAll("button")[1].addEventListener("click", () => {
+      alert("Restart Your Game");
+      location.reload();
+    });
+
+    document.querySelector("button").addEventListener("click", () => {
+      if (isFull() === 0) {
+        console.log("can validate");
+        validate(getRows);
+        validate(getCols);
+        validate(getBoxes);
+      } else {
+        console.log("can't validate");
+        alert("Missing " + isFull() + " gaps to fill!!");
+      }
+    });
+  </script>
+</html>

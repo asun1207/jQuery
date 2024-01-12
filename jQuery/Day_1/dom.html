@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  </head>
+  <body>
+    <div>
+      <h1>I'm H1</h1>
+      <input />
+      <input />
+      <input />
+      <input />
+    </div>
+    <input />
+    <input />
+    <input />
+    <input />
+    <input />
+    <input />
+  </body>
+  <script>
+    //using jQuery HTML GET method
+    console.log($("h1").text());
+
+    //using jQuery HTML SET method: h1.innerText = "This is jQuery"
+    console.log($("h1").text("This is jQuery"));
+
+    //inner dollar sign is for finding value, other one is changing js to jqeury
+    //html elements return to object with outside dollar sign
+    console.log($($("input")[2]).val("test"));
+
+    //all input elements are changing the background color
+    $($("div input")[1]).css("background-color", "lightgray");
+
+    //regular function
+    const focusHandler = (e) => {
+      //if ($(e.target)[0] == $(e.target).parent().children("input").first()[0]) alert("First element");
+      console.log($("input").eq(1).css("display", "none"));
+      if (e.type == "focus") {
+        //target = type of event
+        //$(e.target).css("background-color", "yellow");
+        //to get the first child
+        //console.log($(e.target).parent().children("input").first());
+        //to get the last child
+        //console.log($(e.target).parent().children("input").last());
+      } else if (e.type == "blur") {
+        $(e.target).css("background-color", "white");
+      }
+    };
+    //callback function
+    //console.log($("input").click(clickHandler));
+
+    //when we press any key it will show in console
+    //Three events = down, press, and up
+    //it sent object
+    //key calling value
+    //on sent callback
+    $("input").on({
+      focus: focusHandler,
+      blur: focusHandler,
+    });
+  </script>
+</html>

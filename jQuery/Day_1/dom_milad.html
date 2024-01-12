@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <body>
+    <h1>I'm H1</h1>
+    <input />
+    <input />
+    <input />
+    <input />
+    <input />
+    <input />
+    <input />
+    <input />
+    <input />
+    <input />
+  </body>
+  <script>
+    // console.log($("h1").text()); //using jQuery HTML GET method
+    // console.log($("h1").text("This is jQuery")); //using jQuery HTML SET method: h1.innerText = "This is jQuery"
+    // console.log($($("input")[2]).val("test"));
+    // console.log($($("div input")[1]).css("background-color","yellow"));
+    const focusHandler = (e) => {
+      // console.log($(e.target).parent().children("input").first()); //to get the first child
+      // console.log($(e.target).parent().children("input").last()); to get the last child
+      // if($(e.target)[0] == $(e.target).parent().children("input").first()[0]){
+      //     alert("First element");
+      // }
+      console.log($("input").eq(0).css("display", "none"));
+      if (e.type == "focus") {
+        $(e.target).css("background-color", "yellow");
+      } else if (e.type == "blur") {
+        $(e.target).css("background-color", "white");
+      }
+    };
+    $("input").on({
+      focus: focusHandler,
+      blur: focusHandler,
+    });
+  </script>
+</html>
